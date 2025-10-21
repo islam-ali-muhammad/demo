@@ -1,0 +1,55 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\Tag;
+use App\Models\Post;
+use App\Models\User;
+use App\Models\Comment;
+use Illuminate\Database\Seeder;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+
+class PostSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     *
+     * @return void
+     */
+    public function run()
+    {
+        $author = User::create([
+            'name' => 'Artie Shaw',
+            'email' => 'artie.shaw@jsonapi-tutorial.test',
+            'password' => bcrypt('password'),
+            'email_verified_at' => now(),
+        ]);
+
+        $commenter = User::create([
+            'name' => 'Benny Goodman',
+            'email' => 'benny.goodman@jsonapi-tutorial.test',
+            'password' => bcrypt('password'),
+            'email_verified_at' => now(),
+        ]);
+
+        $tag1 = Tag::create(['name' => 'Laravel']);
+        $tag2 = Tag::create(['name' => 'JSON:API']);
+
+        $post = new Post([
+            'title' => 'Welcome to Laravel JSON:API',
+            'published_at' => now(),
+            'content' => 'In our first blog post, you will learn all about Laravel JSON:API...',
+            'slug' => 'welcome-to-laravel-jsonapi',
+        ]);
+
+        $post->author()->associate($author)->save();
+        $post->tags()->saveMany([$tag1, $tag2]);
+
+        $comment = new Comment([
+            'content' => 'Wow! Great first blog article. Looking forward to more!',
+        ]);
+
+        $comment->post()->associate($post);
+        $comment->user()->associate($commenter)->save();
+    }
+}
